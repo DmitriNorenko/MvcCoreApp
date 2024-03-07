@@ -16,7 +16,7 @@ namespace CoreStartApp.MiddleWare
 
         public async void SaveLogInDb(HttpContext context)
         {
-            string LogValue = $"{context.Request.Host.Value + context.Request.Path}\n";
+            string LogValue = $"{context.Request.Host.Value + context.Request.Path}";
             await _repository.AddLog(LogValue);
         }
         public async Task InvokeAsync(HttpContext context)
