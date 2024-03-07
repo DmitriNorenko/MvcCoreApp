@@ -6,29 +6,22 @@ namespace CoreStartApp.MiddleWare
     public class LoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IBlogRepository _blogRepository;
+        private readonly IRequestRepository _repository;
 
-        public LoggingMiddleware(RequestDelegate next, IBlogRepository blogRepository)
+        public LoggingMiddleware(RequestDelegate next,IRequestRepository repository)
         {
             _next = next;
-            _blogRepository = blogRepository;
+            _repository = repository;
         }
 
-        public void ShowLog(HttpContext context)
+        public async void SaveLogInDb(HttpContext context)
         {
-            Console.WriteLine($"[{DateTime.Now}]: New request to http://{context.Request.Host.Value + context.Request.Path}");
-        }
-        public async void SaveLogInTxt(HttpContext context)
-        {
-            string pathFile = Path.Combine(Directory.GetCurrentDirectory(), "LogInfo.txt");
             string LogValue = $"{context.Request.Host.Value + context.Request.Path}\n";
-            await File.AppendAllTextAsync(pathFile, LogValue);
+            await _repository.AddLog(LogValue);
         }
         public async Task InvokeAsync(HttpContext context)
         {
-           
-            ShowLog(context);
-            SaveLogInTxt(context);
+            SaveLogInDb(context);
             await _next.Invoke(context);
         }
     }
